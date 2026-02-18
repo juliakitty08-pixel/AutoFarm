@@ -32,7 +32,6 @@ ReadCfg(section, key, default) {
     return Trim(IniRead(cfgPath, section, key, default))
 }
 
-
 ; Ability keys
 global keyMeteorFlight  := ReadCfg("Keys","MeteorFlight","Space")
 global keyMightyDrop    := ReadCfg("Keys","MightyDrop","q")
@@ -41,15 +40,17 @@ global keyHeal          := ReadCfg("Keys","Heal","sc029")
 
 ; Heal cooldown (ONLY configurable timing)
 global healCooldownMs := ReadCfg("Timing","HealCooldownMs","60000") + 0
-
 global nextHealTick := 0
-
 
 ; Gather config (loaded from ini)
 global gatherKey := ReadCfg("Gather","Key","f")
 global gatherIntervalMs := ReadCfg("Gather","IntervalMs","10000") + 0
 if (gatherIntervalMs < 1000)
     gatherIntervalMs := 10000
+
+; Toggle hotkeys (configurable)
+global hkToggleGather := ReadCfg("Hotkeys","ToggleGather","F10")
+global hkToggleFarm   := ReadCfg("Hotkeys","ToggleFarm","F11")
 
 ; ---------- Helpers ----------
 SendKeyDown(key) => SendEvent("{" key " down}")
@@ -68,9 +69,7 @@ HoldKey(key, holdMs) {
 }
 
 CastHeal() {
-    global keyHeal, healPostDelayMs
-
-    ; For backtick/tilde (and many special keys), use a simple tap form.   
+    global keyHeal
     SendEvent("{" keyHeal "}")
 }
 
@@ -81,9 +80,8 @@ GatherTick() {
     TapKey(gatherKey, msTap)
 }
 
-; ---------- Toggle ----------
-
-F10:: {
+; ---------- Toggle handlers ----------
+ToggleGather(*) {
     global autogather, gatherIntervalMs
 
     autogather := !autogather
@@ -97,20 +95,18 @@ F10:: {
             "tag=" tag " theme=Aurora dur=3 ts=16 tc=0x80FF80 tf=Microsoft YaHei"
             . " ms=16 mc=0x0BFF0B mf=Microsoft YaHei")
 
-        GatherTick()                         ; fire once now
-        SetTimer(GatherTick, gatherIntervalMs) ; then repeat
+        GatherTick()
+        SetTimer(GatherTick, gatherIntervalMs)
     } else {
         Notify.Show("自动采集 🧺","停止 🔴",,"Windows Restore",,
             "tag=" tag " theme=Aurora dur=3 ts=16 tc=0x80FF80 tf=Microsoft YaHei"
             . " ms=16 mc=Red mf=Microsoft YaHei")
 
-        SetTimer(GatherTick, 0)              ; stop
+        SetTimer(GatherTick, 0)
     }
 }
 
-
-
-F11:: {
+ToggleFarm(*) {
     global autofarm, loopCount, nextHealTick, healCooldownMs, healPostDelayMs
 
     autofarm := !autofarm
@@ -122,28 +118,37 @@ F11:: {
         WinClose("ahk_id " hwnd)
 
     if (autofarm) {
-
         Notify.Show("自动刷宝 🌾","开始 🟢`n`n记得你雪姐的好!",,"Windows Ding",,
             "tag=" tag " theme=Aurora dur=3 ts=16 tc=0x80FF80 tf=Microsoft YaHei"
             . " ms=16 mc=0x0BFF0B mf=Microsoft YaHei")
 
-        ; Immediate heal on start
         CastHeal()
         Sleep healPostDelayMs
-
         nextHealTick := A_TickCount + healCooldownMs
-    }
-    else {
-
+    } else {
         Notify.Show("自动刷宝 🌾","停止 🔴",,"Windows Restore",,
             "tag=" tag " theme=Aurora dur=3 ts=16 tc=0x80FF80 tf=Microsoft YaHei"
             . " ms=16 mc=Red mf=Microsoft YaHei")
     }
 }
 
-; ---------- Autofarm loop ----------
+; ---------- Register configurable hotkeys ----------
+try Hotkey(hkToggleGather, ToggleGather, "On")
+catch as e {
+    MsgBox "Invalid ToggleGather hotkey in ini: " hkToggleGather "`n`n" e.Message
+    ExitApp
+}
+
+try Hotkey(hkToggleFarm, ToggleFarm, "On")
+catch as e {
+    MsgBox "Invalid ToggleFarm hotkey in ini: " hkToggleFarm "`n`n" e.Message
+    ExitApp
+}
+
+; Keep your original "disable F1" line
 $F1::return
 
+; ---------- Autofarm loop ----------
 Loop {
 
     global autofarm, loopCount
@@ -189,13 +194,9 @@ Loop {
 
     ; Heal when cooldown ready
     if (nextHealTick != 0 && A_TickCount >= nextHealTick) {
-
         Sleep healPreDelayMs
-
         CastHeal()
-
         Sleep healPostDelayMs
-
         nextHealTick := A_TickCount + healCooldownMs
     }
 }

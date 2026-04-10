@@ -107,7 +107,7 @@ ShowNotify(tag, title, message, color := "0x0BFF0B", sound := "Windows Ding") {
 
 ; ---------- Toggle handlers ----------
 ToggleGather(*) {
-    global autogather, gatherIntervalMs
+    global autogather, autofarm, autobeef, gatherIntervalMs
 
     autogather := !autogather
 
@@ -132,7 +132,7 @@ ToggleGather(*) {
 }
 
 ToggleFarm(*) {
-    global autofarm, autobeef, loopCount, nextHealTick, healCooldownMs, healPostDelayMs
+    global autofarm, autobeef, autogather, loopCount, nextHealTick, healCooldownMs, healPostDelayMs
 
     autofarm := !autofarm
 
@@ -160,7 +160,7 @@ ToggleFarm(*) {
 }
 
 ToggleBeef(*) {
-    global autobeef, autofarm, loopCount, nextHealTick
+    global autobeef, autofarm, autogather, loopCount, nextHealTick
 
     autobeef := !autobeef
 

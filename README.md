@@ -4,7 +4,7 @@
 [下载最新版本](https://github.com/juliakitty08-pixel/AutoFarm/releases/latest)
 
 程序首次运行需要选“run anyway”, 并授权管理员权限，你们信不过雪姐就不要用了。    
-程序运行时F7,F8,F9和F10会被占用，自动功能关闭的时候不影响正常游戏。    
+程序运行时F7,F8,F9和F10会被占用，自动功能关闭的时候不影响其它正常游戏。    
 要完全退出程序在windows右下角的系统托盘（system tray）里找~~女法师~~乌萨奇的图标，右键选Exit退出就可以了。    
 修改配置文件autofarm.ini以后，需重启程序生效（右键exit，再重新打开一次）
 

@@ -56,7 +56,7 @@ global keyMoSpecial     := ReadCfg("Keys","MoSpecial","sc029")
 global msJadeInterval   := ReadCfg("Keys","JadeInterval","300000")
 
 ; Jade movement keys
-global keyJadeDodge         := "LShift"
+global keyJadeDodge     := ReadCfg("Keys","Dodge","LShift")
 
 ; Heal cooldown
 global healCooldownMs := ReadCfg("Timing","HealCooldownMs","60000") + 0

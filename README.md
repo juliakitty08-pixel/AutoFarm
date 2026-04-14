@@ -109,6 +109,8 @@ TouchOfDeath=f
 Loot=f
 ; 陌刀特殊技, 默认也是~键, 这是用来采集独山玉的
 MoSpecial=sc029
+; 闪避键，用于人物归位
+Dodge=LShift
 ; 独山玉采集间隔，默认300秒，加上陌刀特殊技和人物归位的时间，就会刚好超过5分钟多人世界的刷新时间。
 JadeInterval=300000
 

@@ -32,9 +32,8 @@ global healPostDelayMs := 1000
 
 ; Jade loop timings
 global msJadeStart := 100
-global msAfterMoSpecial := 3800
-global msJadeBetweenS := 1200
-global msAfterJadeW := 10000   ; 5 minutes
+global msAfterMoSpecial := 4000
+
 
 ; ---------- Config loading ----------
 global cfgPath := A_ScriptDir "\autofarm.ini"
@@ -52,6 +51,9 @@ global keyHeal          := ReadCfg("Keys","Heal","sc029")
 global keyDeath         := ReadCfg("Keys","TouchOfDeath","f")
 global keyLoot          := ReadCfg("Keys","Loot","f")
 global keyMoSpecial     := ReadCfg("Keys","MoSpecial","sc029")
+
+; 独山玉采集间隔 5 minutes 300秒
+global msJadeInterval   := ReadCfg("Keys","JadeInterval","300000")
 
 ; Jade movement keys
 global keyJadeDodge         := "LShift"
@@ -126,19 +128,36 @@ ShowNotify(tag, title, message, color := "0x0BFF0B", sound := "Windows Ding") {
         . " ms=16 mc=" color " mf=Microsoft YaHei")
 }
 
-InterruptibleSleep(totalMs, mode := "") {
+; InterruptibleSleep(totalMs, mode := "") {
+;     global autojade
+
+;     elapsed := 0
+;     step := 100
+
+;     while (elapsed < totalMs) {
+;         if (mode = "jade" && !autojade)
+;             return false
+
+;         remaining := totalMs - elapsed
+;         Sleep (remaining < step ? remaining : step)
+;         elapsed += (remaining < step ? remaining : step)
+;     }
+;     return true
+; }
+
+InterruptibleSleepAccurate(totalMs, mode := "") {
     global autojade
 
-    elapsed := 0
+    start := A_TickCount
     step := 100
 
-    while (elapsed < totalMs) {
+    while ((A_TickCount - start) < totalMs) {
         if (mode = "jade" && !autojade)
             return false
 
-        remaining := totalMs - elapsed
-        Sleep (remaining < step ? remaining : step)
-        elapsed += (remaining < step ? remaining : step)
+        remaining := totalMs - (A_TickCount - start)
+        chunk := (remaining < step ? remaining : step)
+        Sleep chunk
     }
     return true
 }
@@ -293,7 +312,7 @@ Loop {
     global msAfterMeteorTap, msAfterMightyDrop
     global msBeforeDragonsBreath, msAfterDragonsBreath
     global msBeforeTouchOfDeath, msBetweenTouchOfDeath, msAfterTouchOfDeath, msAfterLoot
-    global msJadeStart, msAfterMoSpecial, msJadeBetweenS, msAfterJadeW
+    global msJadeStart, msAfterMoSpecial, msJadeInterval
     global nextHealTick, healCooldownMs
     global healPreDelayMs, healPostDelayMs
 
@@ -374,14 +393,14 @@ Loop {
         Sleep msAfterLoot
     }
     else if (currentMode = "jade") {
-        if (!InterruptibleSleep(msJadeStart, "jade"))
+        if (!InterruptibleSleepAccurate(msJadeStart, "jade"))
             continue
 
         if (!autojade)
             continue
         TapKey(keyMoSpecial, msTap)
 
-        if (!InterruptibleSleep(msAfterMoSpecial, "jade"))
+        if (!InterruptibleSleepAccurate(msAfterMoSpecial, "jade"))
             continue
 
         ; stop immediately before movement sequence if toggled off
@@ -390,7 +409,7 @@ Loop {
         TapKey(keyJadeDodge, msTap)
 
         ; this is the important one: do not get stuck for 5 minutes
-        if (!InterruptibleSleep(msAfterJadeW, "jade"))
+        if (!InterruptibleSleepAccurate(msJadeInterval, "jade"))
             continue
     }
 }

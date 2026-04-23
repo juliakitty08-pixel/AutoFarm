@@ -7,63 +7,143 @@ if !A_IsAdmin
 }
 #Include Notify.ahk
 
-global autofarm := false
-global autogather := false
-global autobeef := false
-global autojade := false
-global loopCount := 0
+autofarm := false
+autogather := false
+autobeef := false
+autojade := false
 
 ; ---------- Config loading ----------
-global cfgPath := A_ScriptDir "\autofarm.ini"
+cfgPath := A_ScriptDir "\autofarm.ini"
+keyMeteorFlight := "Space"
+keyMightyDrop := "q"
+keyDragonsBreath := "x"
+keyHeal := "sc029"
+keyDeath := "f"
+keyLoot := "f"
+keyMoSpecial := "sc029"
+keyJadeDodge := "LShift"
+msTap := 60
+msInitial := 100
+msMeteorHold := 2000
+msBeforeMightyDrop := 3500
+msBeforeDragonsBreath := 1200
+msAfterDragonsBreath := 2000
+numberTouchOfDeath := 10
+msBeforeTouchOfDeath := 300
+msBetweenTouchOfDeath := 100
+msAfterTouchOfDeath := 1800
+msAfterLoot := 500
+healPreDelayMs := 1100
+healPostDelayMs := 1000
+msJadeStart := 100
+msAfterMoSpecial := 4000
+msJadeInterval := 300000
+healCooldownMs := 60000
+gatherKey := "f"
+gatherIntervalMs := 10000
+hkToggleGather := "F10"
+hkToggleFarm := "F9"
+hkToggleBeef := "F8"
+hkToggleJade := "F7"
+boundToggleGather := ""
+boundToggleFarm := ""
+boundToggleBeef := ""
+boundToggleJade := ""
+nextHealTick := 0
 
 ReadCfg(section, key, default) {
     global cfgPath
     return Trim(IniRead(cfgPath, section, key, default))
 }
 
-; Ability keys
-global keyMeteorFlight  := ReadCfg("Keys","MeteorFlight","Space")
-global keyMightyDrop    := ReadCfg("Keys","MightyDrop","q")
-global keyDragonsBreath := ReadCfg("Keys","DragonsBreath","x")
-global keyHeal          := ReadCfg("Keys","Heal","sc029")
-global keyDeath         := ReadCfg("Keys","TouchOfDeath","f")
-global keyLoot          := ReadCfg("Keys","Loot","f")
-global keyMoSpecial     := ReadCfg("Keys","MoSpecial","sc029")
+LoadConfig() {
+    global keyMeteorFlight, keyMightyDrop, keyDragonsBreath, keyHeal
+    global keyDeath, keyLoot, keyMoSpecial, keyJadeDodge
+    global msTap, msInitial, msMeteorHold, msBeforeMightyDrop
+    global msBeforeDragonsBreath, msAfterDragonsBreath
+    global numberTouchOfDeath, msBeforeTouchOfDeath, msBetweenTouchOfDeath
+    global msAfterTouchOfDeath, msAfterLoot
+    global healPreDelayMs, healPostDelayMs, msJadeStart, msAfterMoSpecial
+    global msJadeInterval, healCooldownMs
+    global gatherKey, gatherIntervalMs
+    global hkToggleGather, hkToggleFarm, hkToggleBeef, hkToggleJade
 
-; Jade movement keys
-global keyJadeDodge     := ReadCfg("Keys","Dodge","LShift")
+    keyMeteorFlight := ReadCfg("Keys", "MeteorFlight", "Space")
+    keyMightyDrop := ReadCfg("Keys", "MightyDrop", "q")
+    keyDragonsBreath := ReadCfg("Keys", "DragonsBreath", "x")
+    keyHeal := ReadCfg("Keys", "Heal", "sc029")
+    keyDeath := ReadCfg("Keys", "TouchOfDeath", "f")
+    keyLoot := ReadCfg("Keys", "Loot", "f")
+    keyMoSpecial := ReadCfg("Keys", "MoSpecial", "sc029")
+    keyJadeDodge := ReadCfg("Keys", "Dodge", "LShift")
 
-; Timing config
-global msTap                 := ReadCfg("Timing","TapMs","60") + 0
-global msInitial             := ReadCfg("Timing","InitialDelayMs","100") + 0
-global msMeteorHold          := ReadCfg("Timing","MeteorHoldMs","2000") + 0
-global msBeforeMightyDrop    := ReadCfg("Timing","BeforeMightyDropMs","3500") + 0
-global msBeforeDragonsBreath := ReadCfg("Timing","BeforeDragonsBreathMs","1200") + 0
-global msAfterDragonsBreath  := ReadCfg("Timing","AfterDragonsBreathMs","2000") + 0
-global numberTouchOfDeath    := ReadCfg("Timing","TouchOfDeathCount","10") + 0
-global msBeforeTouchOfDeath  := ReadCfg("Timing","BeforeTouchOfDeathMs","300") + 0
-global msBetweenTouchOfDeath := ReadCfg("Timing","BetweenTouchOfDeathMs","100") + 0
-global msAfterTouchOfDeath   := ReadCfg("Timing","AfterTouchOfDeathMs","1800") + 0
-global msAfterLoot           := ReadCfg("Timing","AfterLootMs","500") + 0
-global healPreDelayMs        := ReadCfg("Timing","HealPreDelayMs","1100") + 0
-global healPostDelayMs       := ReadCfg("Timing","HealPostDelayMs","1000") + 0
-global msJadeStart           := ReadCfg("Timing","JadeStartDelayMs","100") + 0
-global msAfterMoSpecial      := ReadCfg("Timing","AfterMoSpecialMs","4000") + 0
-global msJadeInterval        := ReadCfg("Timing","JadeIntervalMs","300000") + 0
-global healCooldownMs        := ReadCfg("Timing","HealCooldownMs","60000") + 0
-global nextHealTick := 0
+    msTap := ReadCfg("Timing", "TapMs", "60") + 0
+    msInitial := ReadCfg("Timing", "InitialDelayMs", "100") + 0
+    msMeteorHold := ReadCfg("Timing", "MeteorHoldMs", "2000") + 0
+    msBeforeMightyDrop := ReadCfg("Timing", "BeforeMightyDropMs", "3500") + 0
+    msBeforeDragonsBreath := ReadCfg("Timing", "BeforeDragonsBreathMs", "1200") + 0
+    msAfterDragonsBreath := ReadCfg("Timing", "AfterDragonsBreathMs", "2000") + 0
+    numberTouchOfDeath := ReadCfg("Timing", "TouchOfDeathCount", "10") + 0
+    msBeforeTouchOfDeath := ReadCfg("Timing", "BeforeTouchOfDeathMs", "300") + 0
+    msBetweenTouchOfDeath := ReadCfg("Timing", "BetweenTouchOfDeathMs", "100") + 0
+    msAfterTouchOfDeath := ReadCfg("Timing", "AfterTouchOfDeathMs", "1800") + 0
+    msAfterLoot := ReadCfg("Timing", "AfterLootMs", "500") + 0
+    healPreDelayMs := ReadCfg("Timing", "HealPreDelayMs", "1100") + 0
+    healPostDelayMs := ReadCfg("Timing", "HealPostDelayMs", "1000") + 0
+    msJadeStart := ReadCfg("Timing", "JadeStartDelayMs", "100") + 0
+    msAfterMoSpecial := ReadCfg("Timing", "AfterMoSpecialMs", "4000") + 0
+    msJadeInterval := ReadCfg("Timing", "JadeIntervalMs", "300000") + 0
+    healCooldownMs := ReadCfg("Timing", "HealCooldownMs", "60000") + 0
 
-; Gather config
-global gatherKey := ReadCfg("Gather","Key","f")
-global gatherIntervalMs := ReadCfg("Gather","IntervalMs","10000") + 0
-if (gatherIntervalMs < 1000)
-    gatherIntervalMs := 10000
+    gatherKey := ReadCfg("Gather", "Key", "f")
+    gatherIntervalMs := ReadCfg("Gather", "IntervalMs", "10000") + 0
+    if (gatherIntervalMs < 1000)
+        gatherIntervalMs := 10000
 
-; Toggle hotkeys
-global hkToggleGather := ReadCfg("Hotkeys","ToggleGather","F10")
-global hkToggleFarm   := ReadCfg("Hotkeys","ToggleFarm","F9")
-global hkToggleBeef   := ReadCfg("Hotkeys","ToggleBeef","F8")
-global hkToggleJade   := ReadCfg("Hotkeys","ToggleJade","F7")
+    hkToggleGather := ReadCfg("Hotkeys", "ToggleGather", "F10")
+    hkToggleFarm := ReadCfg("Hotkeys", "ToggleFarm", "F9")
+    hkToggleBeef := ReadCfg("Hotkeys", "ToggleBeef", "F8")
+    hkToggleJade := ReadCfg("Hotkeys", "ToggleJade", "F7")
+}
+
+SyncOneHotkey(&boundHotkey, newHotkey, handler, settingName) {
+    oldHotkey := boundHotkey
+    if (newHotkey = oldHotkey && oldHotkey != "")
+        return true
+
+    try {
+        if (oldHotkey != "")
+            Hotkey(oldHotkey, handler, "Off")
+        Hotkey(newHotkey, handler, "On")
+        boundHotkey := newHotkey
+        return true
+    } catch as e {
+        if (oldHotkey != "" && newHotkey != oldHotkey) {
+            try Hotkey(oldHotkey, handler, "On")
+        }
+        MsgBox "Invalid " settingName " hotkey in ini: " newHotkey "`n`n" e.Message
+        return false
+    }
+}
+
+SyncToggleHotkeys() {
+    global hkToggleGather, hkToggleFarm, hkToggleBeef, hkToggleJade
+    global boundToggleGather, boundToggleFarm, boundToggleBeef, boundToggleJade
+
+    ok := true
+    ok := SyncOneHotkey(&boundToggleGather, hkToggleGather, ToggleGather, "ToggleGather") && ok
+    ok := SyncOneHotkey(&boundToggleFarm, hkToggleFarm, ToggleFarm, "ToggleFarm") && ok
+    ok := SyncOneHotkey(&boundToggleBeef, hkToggleBeef, ToggleBeef, "ToggleBeef") && ok
+    ok := SyncOneHotkey(&boundToggleJade, hkToggleJade, ToggleJade, "ToggleJade") && ok
+    return ok
+}
+
+ReloadConfig() {
+    LoadConfig()
+    return SyncToggleHotkeys()
+}
+
+LoadConfig()
 
 ; ---------- Helpers ----------
 SendKeyDown(key) => SendEvent("{" key " down}")
@@ -119,23 +199,6 @@ ShowNotify(tag, title, message, color := "0x0BFF0B", sound := "Windows Ding") {
         . " ms=16 mc=" color " mf=Microsoft YaHei")
 }
 
-; InterruptibleSleep(totalMs, mode := "") {
-;     global autojade
-
-;     elapsed := 0
-;     step := 100
-
-;     while (elapsed < totalMs) {
-;         if (mode = "jade" && !autojade)
-;             return false
-
-;         remaining := totalMs - elapsed
-;         Sleep (remaining < step ? remaining : step)
-;         elapsed += (remaining < step ? remaining : step)
-;     }
-;     return true
-; }
-
 InterruptibleSleepAccurate(totalMs, mode := "") {
     global autojade
 
@@ -157,7 +220,10 @@ InterruptibleSleepAccurate(totalMs, mode := "") {
 ToggleGather(*) {
     global autogather, autofarm, autobeef, autojade, gatherIntervalMs
 
-    autogather := !autogather
+    nextState := !autogather
+    if (nextState && !ReloadConfig())
+        return
+    autogather := nextState
 
     if (autogather) {
         if (autobeef) {
@@ -183,10 +249,13 @@ ToggleGather(*) {
 }
 
 ToggleFarm(*) {
-    global autofarm, autobeef, autogather, autojade
-    global loopCount, nextHealTick, healCooldownMs, healPostDelayMs
+    global autofarm, autobeef, autojade
+    global nextHealTick, healCooldownMs, healPostDelayMs
 
-    autofarm := !autofarm
+    nextState := !autofarm
+    if (nextState && !ReloadConfig())
+        return
+    autofarm := nextState
 
     if (autofarm) {
         if (autobeef) {
@@ -200,7 +269,6 @@ ToggleFarm(*) {
 
         StopGatherIfNeeded()
 
-        loopCount := 0
         nextHealTick := 0
 
         ShowNotify("AutoFarmToggle", "自动刷宝 🌾", "开始 🟢`n`n记得你雪姐的好!")
@@ -215,10 +283,13 @@ ToggleFarm(*) {
 }
 
 ToggleBeef(*) {
-    global autobeef, autofarm, autogather, autojade
-    global loopCount, nextHealTick
+    global autobeef, autofarm, autojade
+    global nextHealTick
 
-    autobeef := !autobeef
+    nextState := !autobeef
+    if (nextState && !ReloadConfig())
+        return
+    autobeef := nextState
 
     if (autobeef) {
         if (autofarm) {
@@ -232,7 +303,6 @@ ToggleBeef(*) {
 
         StopGatherIfNeeded()
 
-        loopCount := 0
         nextHealTick := 0
         ShowNotify("AutoBeefToggle", "自动刷牛筋 🥩", "开始 🟢`n`n记得你雪姐的好!")
     } else {
@@ -241,10 +311,13 @@ ToggleBeef(*) {
 }
 
 ToggleJade(*) {
-    global autojade, autofarm, autobeef, autogather
-    global loopCount, nextHealTick
+    global autojade, autofarm, autobeef
+    global nextHealTick
 
-    autojade := !autojade
+    nextState := !autojade
+    if (nextState && !ReloadConfig())
+        return
+    autojade := nextState
 
     if (autojade) {
         if (autofarm) {
@@ -258,7 +331,6 @@ ToggleJade(*) {
 
         StopGatherIfNeeded()
 
-        loopCount := 0
         nextHealTick := 0
         ShowNotify("AutoJadeToggle", "自动刷玉 🟢", "开始 🟢`n`n记得你雪姐的好!")
     } else {
@@ -267,46 +339,14 @@ ToggleJade(*) {
 }
 
 ; ---------- Register configurable hotkeys ----------
-try Hotkey(hkToggleGather, ToggleGather, "On")
-catch as e {
-    MsgBox "Invalid ToggleGather hotkey in ini: " hkToggleGather "`n`n" e.Message
+if (!SyncToggleHotkeys())
     ExitApp
-}
-
-try Hotkey(hkToggleFarm, ToggleFarm, "On")
-catch as e {
-    MsgBox "Invalid ToggleFarm hotkey in ini: " hkToggleFarm "`n`n" e.Message
-    ExitApp
-}
-
-try Hotkey(hkToggleBeef, ToggleBeef, "On")
-catch as e {
-    MsgBox "Invalid ToggleBeef hotkey in ini: " hkToggleBeef "`n`n" e.Message
-    ExitApp
-}
-
-try Hotkey(hkToggleJade, ToggleJade, "On")
-catch as e {
-    MsgBox "Invalid ToggleJade hotkey in ini: " hkToggleJade "`n`n" e.Message
-    ExitApp
-}
 
 ; Keep your original "disable F1" line
 $F1::return
 
 ; ---------- Main loop ----------
 Loop {
-    global autofarm, autobeef, autojade, loopCount
-    global keyMeteorFlight, keyMightyDrop, keyDragonsBreath, keyDeath, keyLoot
-    global keyMoSpecial, keyJadeDodge
-    global msInitial, msMeteorHold, msTap
-    global msBeforeMightyDrop
-    global msBeforeDragonsBreath, msAfterDragonsBreath
-    global numberTouchOfDeath, msBeforeTouchOfDeath, msBetweenTouchOfDeath, msAfterTouchOfDeath, msAfterLoot
-    global msJadeStart, msAfterMoSpecial, msJadeInterval
-    global nextHealTick, healCooldownMs
-    global healPreDelayMs, healPostDelayMs
-
     if (!autofarm && !autobeef && !autojade) {
         Sleep 50
         continue
@@ -319,8 +359,6 @@ Loop {
         currentMode := "beef"
     else
         currentMode := "jade"
-
-    loopCount += 1
 
     if (currentMode = "farm") {
         Sleep msInitial
@@ -382,7 +420,7 @@ Loop {
 
         ; stop immediately before movement sequence if toggled off
         if (!autojade)
-            continue      
+            continue
         TapKey(keyJadeDodge, msTap)
 
         ; this is the important one: do not get stuck for 5 minutes

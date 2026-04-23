@@ -48,10 +48,13 @@ v5 修正了不少问题：
 - 跟毒塔一样的的三面墙封顶结构，不需要中间平台放马，因为脚本包括了捡拾。
 - 原版毒塔一共是22层，但这个弓箭手站的台子本身有高度，所以17层就够。
 - 第一只需要手动打掉，再站在弓箭手原来的位置按F8开始
+- 墙贴着弓箭手的脸修，这样千斤坠后人物会自动卡到他身后以便灵虚一指
 
 <img src="assets\2026414181641.jpg" alt="Screenshot" width="600">
 
 <img src="assets\2026414181724.jpg" alt="Screenshot" width="600">
+
+<img src="assets\Screenshot 2026-04-22 235129.png" alt="Screenshot" width="600">
 
 
 ---

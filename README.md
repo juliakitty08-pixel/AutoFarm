@@ -54,7 +54,7 @@ v5 修正了不少问题：
 
 <img src="assets\2026414181724.jpg" alt="Screenshot" width="600">
 
-<img src="assets\Screenshot 2026-04-22 235129.png" alt="Screenshot" width="600">
+<img src="assets\Screenshot 2026-04-22 235129.jpg" alt="Screenshot" width="600">
 
 
 ---

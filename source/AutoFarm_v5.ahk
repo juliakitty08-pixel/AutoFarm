@@ -13,27 +13,6 @@ global autobeef := false
 global autojade := false
 global loopCount := 0
 
-; ---------- Hard-coded combat timings ----------
-global msTap := 60
-global msInitial := 100
-global msMeteorHold := 2000
-global msBeforeMightyDrop := 3500
-global msBeforeDragonsBreath := 1200
-global msAfterDragonsBreath := 2000
-global numberTouchOfDeath := 10
-global msBeforeTouchOfDeath := 300
-global msBetweenTouchOfDeath := 100
-global msAfterTouchOfDeath := 1800
-global msAfterLoot := 500
-
-global healPreDelayMs := 1100
-global healPostDelayMs := 1000
-
-; Jade loop timings
-global msJadeStart := 100
-global msAfterMoSpecial := 4000
-
-
 ; ---------- Config loading ----------
 global cfgPath := A_ScriptDir "\autofarm.ini"
 
@@ -51,14 +30,27 @@ global keyDeath         := ReadCfg("Keys","TouchOfDeath","f")
 global keyLoot          := ReadCfg("Keys","Loot","f")
 global keyMoSpecial     := ReadCfg("Keys","MoSpecial","sc029")
 
-; 独山玉采集间隔 5 minutes 300秒
-global msJadeInterval   := ReadCfg("Keys","JadeInterval","300000")
-
 ; Jade movement keys
 global keyJadeDodge     := ReadCfg("Keys","Dodge","LShift")
 
-; Heal cooldown
-global healCooldownMs := ReadCfg("Timing","HealCooldownMs","60000") + 0
+; Timing config
+global msTap                 := ReadCfg("Timing","TapMs","60") + 0
+global msInitial             := ReadCfg("Timing","InitialDelayMs","100") + 0
+global msMeteorHold          := ReadCfg("Timing","MeteorHoldMs","2000") + 0
+global msBeforeMightyDrop    := ReadCfg("Timing","BeforeMightyDropMs","3500") + 0
+global msBeforeDragonsBreath := ReadCfg("Timing","BeforeDragonsBreathMs","1200") + 0
+global msAfterDragonsBreath  := ReadCfg("Timing","AfterDragonsBreathMs","2000") + 0
+global numberTouchOfDeath    := ReadCfg("Timing","TouchOfDeathCount","10") + 0
+global msBeforeTouchOfDeath  := ReadCfg("Timing","BeforeTouchOfDeathMs","300") + 0
+global msBetweenTouchOfDeath := ReadCfg("Timing","BetweenTouchOfDeathMs","100") + 0
+global msAfterTouchOfDeath   := ReadCfg("Timing","AfterTouchOfDeathMs","1800") + 0
+global msAfterLoot           := ReadCfg("Timing","AfterLootMs","500") + 0
+global healPreDelayMs        := ReadCfg("Timing","HealPreDelayMs","1100") + 0
+global healPostDelayMs       := ReadCfg("Timing","HealPostDelayMs","1000") + 0
+global msJadeStart           := ReadCfg("Timing","JadeStartDelayMs","100") + 0
+global msAfterMoSpecial      := ReadCfg("Timing","AfterMoSpecialMs","4000") + 0
+global msJadeInterval        := ReadCfg("Timing","JadeIntervalMs","300000") + 0
+global healCooldownMs        := ReadCfg("Timing","HealCooldownMs","60000") + 0
 global nextHealTick := 0
 
 ; Gather config

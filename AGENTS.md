@@ -5,25 +5,26 @@
 ## 唯一入口与阅读
 
 - 当前状态与下一任务：`docs/DEVELOPMENT.md`（唯一入口，先读第 1、2、5、7 节）。
-- 设计落点：`docs/ENGINEERING_DESIGN.md`；验证资格：`docs/VALIDATION.md`；历史：`docs/history/`；证据：`docs/evidence/`；维护记录：`docs/maintenance/`。
+- 设计落点：`docs/ENGINEERING_DESIGN.md`；AutoSpace 主题：`docs/modules/autospace/README.md`；验证资格：`docs/VALIDATION.md`；历史：`docs/history/`；证据：`docs/evidence/`；维护记录：`docs/maintenance/`。
 - `README.md` 是面向用户的安装/功能/配置说明，不承载开发状态；用户可见的版本历史在 `docs/history/release-notes.md`。
 - 仓库无既有编号体系：任务用任务名或日期标识。
 
 ## 项目结构与权威路径
 
-- 活跃实现：`source/AutoFarm_v5.ahk`。`source/AutoFarm_v3.ahk`、`source/AutoFarm_v4.ahk`、`source/AutoFarm.ahk` 只是参考快照，除非用户明确要求，不修改。
-- 配置权威：`source/autofarm.ini`（键名、默认值、注释、单位）。改动脚本默认值必须同步该文件。
+- 活跃实现：`source/AutoFarm_v5.ahk`（主宏）与 `source/AutoSpace_v1.ahk`（独立空格连按）。`source/AutoFarm_v3.ahk`、`source/AutoFarm_v4.ahk`、`source/AutoFarm.ahk` 只是参考快照，除非用户明确要求，不修改。
+- 配置权威：`source/autofarm.ini` 与 `source/autospace.ini`（键名、默认值、注释、单位）。改动任一脚本默认值必须同步对应 INI。
 - 共享与第三方：`source/Lib/`、`source/Notify.ahk`、`source/Icons.dll`；通知示例与自检：`source/Examples.ahk`、`source/Notifytest.ahk`、`source/Notify Creator.ahk`；上游说明：`source/README.md`。
 - README 截图：`assets/`；许可：`LICENSE`、`source/LICENSE`、`source/Licenses/`。
 
 ## 运行、测试与验证
 
-- 无构建系统；用 AutoHotkey v2 在 Windows 直接运行：
+- 无构建系统；用 AutoHotkey v2 在 Windows 直接运行。本机安装目录：`D:\ScoopApps\apps\autohotkey\current`；可执行文件：`D:\ScoopApps\apps\autohotkey\current\v2\AutoHotkey64.exe`。
   - `AutoHotkey64.exe source\AutoFarm_v5.ahk`（主宏，需管理员）
+  - `AutoHotkey64.exe source\AutoSpace_v1.ahk`（空格连按，需管理员）
   - `AutoHotkey64.exe source\Notifytest.ahk`（通知冒烟）
   - `AutoHotkey64.exe source\Examples.ahk`（Notify 示例）
-- 硬约束：所有测试必须由人工在 Windows + AutoHotkey v2 上完成。不得添加、运行或依赖自动化测试、测试脚手架或 agent 驱动的验证，覆盖游戏宏、热键、时序循环与通知行为。
-- 每次改动后由人启动受影响脚本，确认热键注册、开始/停止通知、时序循环，以及 `source/autofarm.ini` 加载（重启或热键重启循环后）符合预期。
+- 硬约束：所有行为测试必须由人工在 Windows + AutoHotkey v2 上完成。不得添加、运行或依赖自动化测试、测试脚手架或 agent 驱动的行为验证，覆盖游戏宏、热键、时序循环与通知行为。允许用 `AutoHotkey64.exe /Validate <script>` 做加载期语法检查；它不执行脚本、不发送输入，不能替代人工行为验证。
+- 每次改动后由人启动受影响脚本，确认热键注册、开始/停止通知、时序循环，以及对应 `source/autofarm.ini` / `source/autospace.ini` 加载（重启或热键重启循环后）符合预期。
 - 资格定义与未覆盖范围见 `docs/VALIDATION.md`。
 
 ## 代码风格与命名
@@ -34,9 +35,9 @@
 
 ## 配置约定
 
-- 新增或调整配置键：同时更新 `source/autofarm.ini`（键、注释、单位）与 `source/AutoFarm_v5.ahk`（全局变量、`LoadConfig` 读取、代码默认值），两处默认值必须一致。
+- 新增或调整配置键：同时更新对应 INI（键、注释、单位）与对应脚本（全局变量、`LoadConfig` 读取、代码默认值），两处默认值必须一致：`source/autofarm.ini` ↔ `source/AutoFarm_v5.ahk`，`source/autospace.ini` ↔ `source/AutoSpace_v1.ahk`。
 - 用户可见行为变化同步到 `README.md` 的对应说明，不要只改代码。
-- 不提交个人热键或机器专属设置，除非同时更新 `source/autofarm.ini` 注释说明默认行为。
+- 不提交个人热键或机器专属设置，除非同时更新对应 INI 注释说明默认行为。
 
 ## Git 身份与提交（项目例外）
 
@@ -56,5 +57,5 @@
 
 ## 安全与提权
 
-- 主脚本启动时请求管理员权限；不要新增提权路径，除非输入自动化确实需要。
+- 脚本启动时请求管理员权限；不要新增提权路径，除非输入自动化确实需要。
 - 输入发送保持 `SendEvent` + down/up 模式；时序值从 INI 读取，不写死新常量。

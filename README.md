@@ -1,6 +1,7 @@
 # AutoFarm
 
-这是一个基于 AutoHotkey v2 的自动刷毒塔与自动采集脚本。    
+这是一个基于 AutoHotkey v2 的自动刷毒塔与自动采集脚本，附带独立的 AutoSpace 空格连按工具。
+
 [下载最新版本](https://github.com/juliakitty08-pixel/AutoFarm/releases/latest)
 
 程序首次运行需要选“run anyway”, 并授权管理员权限，你们信不过雪姐就不要用了。    
@@ -76,6 +77,19 @@
 
 ---
 
+### 连续按空格 (AutoSpace)
+
+- 热键：`F9` 开启 / 关闭
+- 功能：
+  - 按设定间隔连续按空格键
+  - 运行中按 `-` 减少间隔、按 `=` 增加间隔，通知会显示新的间隔
+  - 关闭循环时，把当前间隔写回 `autospace.ini`
+- 默认每次间隔 200 毫秒，每次调整 10 毫秒，可在 `source/autospace.ini` 修改。
+- 运行：`AutoHotkey64.exe source\AutoSpace_v1.ahk`；本机安装目录 `D:\ScoopApps\apps\autohotkey\current`，可执行文件 `D:\ScoopApps\apps\autohotkey\current\v2\AutoHotkey64.exe`。
+- AutoSpace 运行中占用 `-` / `=`；`F9` 与 AutoFarm 的刷宝 `F9` 冲突，不要同时运行。如需同时使用，请修改 `autospace.ini` 的 `[Hotkeys] Toggle`。
+
+---
+
 ## 配置文件说明
 
 请参照注释自行修改热键    
@@ -123,6 +137,33 @@ HealCooldownMs=60000
 Key=f
 ; 采集间隔，默认10秒
 IntervalMs=10000
+```
+
+### AutoSpace 配置
+
+AutoSpace 的配置在 `source/autospace.ini`（请保持 UTF-8 编码）：
+
+autospace.ini
+```ini
+[Hotkeys]
+; Toggle 连续按空格
+Toggle=F9
+; 减少按键间隔
+GapDecrease=-
+; 增加按键间隔（值就是等号）
+GapIncrease==
+
+[Keys]
+; 连续按下的按键，默认空格
+Key=Space
+
+[Timing]
+; 每次按键之间的等待间隔，单位毫秒
+KeyPressGap=200
+; 每次调整的步进值，单位毫秒
+Adjustment=10
+; 按键按下时长，单位毫秒
+TapMs=60
 ```
 
 ---
